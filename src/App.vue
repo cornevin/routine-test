@@ -1,18 +1,25 @@
 <template>
   <div id="app">
     <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+
+    <SearchBar v-model="search" />
+
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import SearchBar from './components/SearchBar.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
-  }
+    SearchBar,
+  },
+  data() {
+    return {
+      search: '',
+    }
+  },
 }
 </script>
 
