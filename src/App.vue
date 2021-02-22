@@ -1,9 +1,6 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-
     <SearchBar v-model="search" />
-
   </div>
 </template>
 
@@ -25,11 +22,17 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: GT America, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
 }
+
+@font-face {
+  font-family: "GT America";
+  src: local("GT America"), url(./assets/fonts/GT-America-Regular.otf) format("truetype");
+}
+
 </style>
