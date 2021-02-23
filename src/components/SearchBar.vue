@@ -6,16 +6,19 @@
       contenteditable 
       v-html="parsedHtml" 
       @input="onInput"
+      placeholder="What will you pick?"
     />
 
     <div v-if="showResults" class="results">
-      <div 
-        v-for="(result, id) in resultList" 
-        :key="id" 
-        class="resultItem"
-        @click="onResultClick(result)"
-      >
-        {{ result.phrase }}
+      <div class="resultsWrapper">
+        <div 
+          v-for="(result, id) in resultList" 
+          :key="id" 
+          class="resultItem"
+          @click="onResultClick(result)"
+        >
+          {{ result.phrase }}
+        </div>
       </div>
     </div>
   </div>
@@ -39,11 +42,13 @@ export default {
   },
   data() {
     return {
-      isSearching: false,
       /**
        * List of all the results fetched according to what the user typed
        */
       resultList: [],
+      /**
+       * Boolean that define if we show the last fetched list of results or not
+       */
       showResults: false,
     }
   },
@@ -76,9 +81,9 @@ export default {
     onResultClick(result) {
       const { search } = this
       this.showResults = false
-      
+
       const myRegexp = new RegExp('(?<=I pick you).*', 'i')
-      this.$emit('change', `${search.split(myRegexp)} ${result.phrase}`)
+      this.$emit('change', `${search.split(myRegexp)[0]} ${result.phrase}`)
     }
   },
   computed: {
@@ -89,7 +94,7 @@ export default {
       const re = new RegExp('I pick you', 'i')
 
       let html = this.search.replace(new RegExp('(?<=I pick you).*', 'i'), match => {
-        return `&#32<span class="highlightText">${match.trim()}</span>`
+        return `&nbsp;<span class="highlightText">${match.trim()}</span>`
       })
 
       if (html) {
@@ -142,12 +147,26 @@ export default {
   background: #F6F3EE;
   border-radius: 5px;
   width: 800px;
+  align-items:center;
   margin: 0 auto;
   font-family: GT America;
   font-style: normal;
   font-weight: normal;
   font-size: 26px;
   line-height: 150%;
+}
+
+.searchBar:empty:before {
+  content: attr(placeholder);
+  display: block;
+  position: absolute;
+  color: #BBB2A1;
+  pointer-events: none;
+}
+
+/* Trick to display the carret verticaly center when the search is focus and empty */
+.searchBar:empty:focus {
+  margin-bottom: -24px;
 }
 
 .pick {
@@ -174,6 +193,7 @@ export default {
   padding: 16px 32px 32px 16px;
   margin: 0 auto;
   width: 500px;
+  max-height: 200px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -183,6 +203,11 @@ export default {
   box-sizing: border-box;
   box-shadow: 0px 1px 14px rgba(0, 0, 0, 0.05);
   border-radius: 3px;
+}
+
+.resultsWrapper {
+  overflow: scroll;
+  width: 100%
 }
 
 .resultItem {
