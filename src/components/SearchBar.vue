@@ -25,7 +25,6 @@
 </template>
 
 <script>
-/* eslint-disable no-unused-vars */
 import axios from 'axios'
 
 export default {
@@ -35,9 +34,19 @@ export default {
     event: 'change'
   },
   props: {
+    /**
+     * Current search the user currently typing (binded to v-model)
+     */
     search: {
       type: String,
       default: null,
+    },
+    /**
+     * List of pokemon chose by the user
+     */
+    pokemonList: {
+      type: Array,
+      default: () => []
     },
   },
   data() {
@@ -69,10 +78,12 @@ export default {
       const myRegexp = new RegExp('(?<=I pick you).*', 'i')
 
       if (myRegexp.test(text)) {
-        this.showResults = true
-
         axios.get(`https://bleeding.routine.co:8080/completion?query=${myRegexp.exec(text)[0].trim()}`)
           .then(res => { this.resultList = res.data.completions })
+
+        this.showResults = this.resultList.length > 0
+      } else {
+        this.showResults = false
       }
     },
     /**
@@ -83,7 +94,10 @@ export default {
       this.showResults = false
 
       const myRegexp = new RegExp('(?<=I pick you).*', 'i')
-      this.$emit('change', `${search.split(myRegexp)[0]} ${result.phrase}`)
+      this.$emit('change', `${search.split(myRegexp)[0]}&nbsp;${result.phrase}&nbsp;`)
+      this.$emit('chose', result.phrase)
+
+      this.$refs.input.focus()
     }
   },
   computed: {
@@ -93,9 +107,17 @@ export default {
     parsedHtml() {
       const re = new RegExp('I pick you', 'i')
 
-      let html = this.search.replace(new RegExp('(?<=I pick you).*', 'i'), match => {
-        return `&nbsp;<span class="highlightText">${match.trim()}</span>`
-      })
+      let html 
+
+      if (this.pokemonList[0]) {
+        html = this.search.replace(this.pokemonList[0], match => {
+          return `<span class="highlightText">${match.trim()}</span><div></div>`
+        })
+      } else {
+        html = this.search.replace(new RegExp('(?<=I pick you).*', 'i'), match => {
+          return `&nbsp;<span class="highlightText">${match.trim()}</span>`
+        })
+      }
 
       if (html) {
         html = html.replace(re, match => {
@@ -143,7 +165,7 @@ export default {
   height: 71px;
   box-sizing: border-box;
   display: flex;
-  padding: 16px 24px;
+  padding: 16px 80px 16px 24px;
   background: #F6F3EE;
   border-radius: 5px;
   width: 800px;
@@ -154,6 +176,9 @@ export default {
   font-weight: normal;
   font-size: 26px;
   line-height: 150%;
+  background-image: url('../assets/logo.svg');
+  background-repeat: no-repeat;
+  background-position: calc(100% - 24px);
 }
 
 .searchBar:empty:before {
@@ -179,6 +204,7 @@ export default {
 }
 
 .highlightText {
+  min-height: 31px;
   padding: 2px 10px;
   font-family: GT America;
   font-style: normal;

@@ -1,6 +1,10 @@
 <template>
   <div id="app">
-    <SearchBar v-model="search" />
+    <SearchBar 
+      v-model="search" 
+      @chose="onPokemonChose"
+      :pokemonList="pokemonList"
+    />
   </div>
 </template>
 
@@ -15,7 +19,13 @@ export default {
   data() {
     return {
       search: '',
+      pokemonList: [],
     }
+  },
+  methods: {
+    onPokemonChose(value) {
+      this.pokemonList.push(value)
+    },
   },
 }
 </script>
